@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+<meta name="renderer" content="webkit">
+<link rel="stylesheet"href="/static/plugins/bootstrap/css/font-awesome.min.css" />
+<link rel="stylesheet" href="/static/layui/css/layui.css" />
+<style type="text/css">
+	.layui-input{height: 38px;}
+	.layui-form-item .layui-input-inline{width:330px;}
+	
+	.security_code{margin-top:80px;}
+	.new_phone{display:none;margin-top:50px;}
+</style>
+</head>
+<body>
+<form id="changePhone" class="layui-form layui-form-pane" action="">
+	<div class="security_code" id="securityCode">
+		<div class="layui-form-item">
+			<div class="layui-inline" id="seatCount">
+				<label class="layui-form-label" >短信验证码:</label>
+				<div class="layui-input-inline">
+					<input name="securityCode1" lay-verify="required" placeholder="请输入短信验证码" id="securityCode1"
+						autocomplete="off" class="layui-input" type="text" style="width:187px;display: inline-block;">
+					<i class="captcha pull-right">
+                        <button type="button" class="layui-btn" id="bizConsCaptchaBtn1">获取验证码</button>
+                    </i>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="new_phone" id="newPhone">
+		<div class="layui-form-item" >
+			<div class="layui-inline" >
+				<label class="layui-form-label" >新手机号:</label>
+				<div class="layui-input-inline">
+					<input name="newPhone" placeholder="请输入新手机号"   id="tel"
+						autocomplete="off" class="layui-input" type="tel" maxlength="11">
+				</div>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<div class="layui-inline">
+				<label class="layui-form-label" >短信验证码:</label>
+				<div class="layui-input-inline">
+					<input name="securityCode2" placeholder="请输入短信验证码" id="securityCode2"
+						autocomplete="off" class="layui-input" type="text" style="width:187px;display: inline-block;">
+					<i class="captcha pull-right">
+                        <button type="button" class="layui-btn btn-blue" id="bizConsCaptchaBtn2">获取验证码</button>
+                    </i>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div>
+		<button class="lay-submit" lay-submit="" lay-filter="save" style="display: none;"></button>
+	</div>
+</form>
+	
+	<script src="/static/layui/layui.js"></script>
+	<script src="/static/system/js/common.js"></script>
+	<script src="/static/plugins/jQuery/jquery-2.2.3.min.js"></script>
+	<script>
+    //表格渲染
+    layui.use(['layer','jquery','form'], function () {
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var form=layui.form;
+      //按钮操作事件绑定
+      var regTel = /^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9])\d{8}$/;
+        var active = {
+            //旧手机发送验证码
+            bizConsCaptchaBtn1: function(){
+            	 $.ajax({
+                     url: "/dubbo/sys/appModifyTelService/sendOldTelAuthCode.json", 
+                     type: "post",
+                     success: function (data) {
+                    	var res = JSON.parse(data);
+                       captcha("bizConsCaptchaBtn1",60);
+                  	   if(res.code==="0"){
+                         	setTimeout("document.getElementById('bizConsCaptchaBtn1').value=''",1000*60*5);
+                  	   }else{
+                  		 layer.msg(res.msg);
+                        }
+                     },
+                     error:function(){
+                  	   layer.tips("获取验证码失败，请重新获取!", '#bizConsCaptchaBtn1');
+                     },
+                  });
+            },
+          	//新手机发送验证码
+            bizConsCaptchaBtn2: function(){
+            	var newPhone=$('input[name="newPhone"]').val();
+	           	$.ajax({
+	                 url: "/dubbo/sys/appModifyTelService/sendNewTelAuthCode.json", 
+	                 type: "post",
+	                 data: {newTel:newPhone},
+	                 success: function (data) {
+	                   captcha("bizConsCaptchaBtn2",60);
+	                   var res = JSON.parse(data);
+	              	   if(res.code==="0"){
+	                     	setTimeout("document.getElementById('bizConsCaptchaBtn2').value=''",1000*60*5);
+	              	   }else{
+	              		 layer.msg(res.msg);
+	                   }
+	                 },
+	                 error:function(){
+	              	   	layer.tips("获取验证码失败，请重新获取!", '#bizConsCaptchaBtn2');
+	                 },
+	                 
+	           });
+            },
+        };
+        $('.layui-btn').on('click', function (e) {
+            layui.stope(e); //阻止事件冒泡
+            var othis = $(this), method = othis.attr('id');
+            active[method] ? active[method].call(this, othis) : '';
+        });
+        
+      	//确定按钮事件;
+		form.on("submit(save)", function(data) {
+			if($("#newPhone").css("display")=="none"){
+				//验证旧手机验证码是否正确
+				var authCode =  $("#securityCode1").val();
+	            if(authCode == null || authCode == ""){
+	                layer.tips("短信验证码不能为空", '#bizConsCaptchaBtn1');
+	                return false;
+	            }else{
+	            	if(authCode == ""){
+	            		$("#bizConsCaptchaBtn1").val("");
+	            		layer.msg("短信验证码已过期，请重新获取!");
+	            		return false;
+	            	}else{
+	            		 //验证旧手机验证码是否正确
+	            		 var code =true;
+	                  	 $.ajax({
+	                         url: "/dubbo/sys/appModifyTelService/validateOldTelAuthCode.json", 
+	                         type: "post",
+	                         async:false,
+	                         data: {authCode:authCode},
+	                         success: function (data) {
+	                           var res = JSON.parse(data);
+	                      	   if(res.code==="0"){
+	                             	setTimeout("document.getElementById('bizConsCaptchaBtn1').value=''",1000*60*5);
+	                      	   }else{
+	                      		   code =false;
+	                      		 layer.msg(res.msg);
+	                          	  return false;
+	                            }
+	                         },
+	                         error:function(){
+	                        	 code=false;
+	                      	   layer.tips("验证错误！", '#bizConsCaptchaBtn1');
+	                         },
+	                         
+	                      });
+	                  	 if(!code){
+	                  		return false;
+	                  	 }
+	            	}
+	            	
+	            }
+				$("#securityCode").hide();
+				$("#newPhone").show();
+			}else{
+				var newPhone=$('input[name="newPhone"]').val();
+				var securityCode2=$('input[name="securityCode2"]').val();
+	            if(!newPhone) {
+	            	layer.msg("请输入新手机号！");
+	                return false;
+	            }else if(!regTel.test(newPhone)){
+	                layer.msg("手机号码格式不正确");
+	                return false;
+	            }
+	            if(!securityCode2){
+					layer.msg("请输入验证码！");
+					return false;
+				}else{
+					//验证新手机号
+					 var code =true;
+                 	 $.ajax({
+                         url: "/dubbo/sys/appModifyTelService/validateNewTelAuthCode.json", 
+                         type: "post",
+                         async:false,
+                         data: {authCode:securityCode2},
+                         success: function (data) {
+                           var res = JSON.parse(data);
+                      	   if(res.code==="0"){
+                      			parent.layer.isSuccess=true;
+                             	setTimeout("document.getElementById('bizConsCaptchaBtn2').value=''",1000*60*5);
+                      	   }else{
+                      		 code=false;
+                      		layer.msg(res.msg);
+                            }
+                         },
+                         error:function(){
+                        	 code=false;
+                      	   layer.tips("验证错误！", '#bizConsCaptchaBtn2');
+                         },
+                         
+                      });
+                 	 if(!code){
+                 		$("#bizConsCaptchaBtn2").val("");
+                		return false; 
+                 	 }
+				}
+			}
+			return false;
+		});
+		
+        
+        //点击获取验证码后button倒计时有效期
+        function captcha(btnId,cnt) {
+            var btn = $('#'+ btnId);
+            var count = cnt;
+            var resend = setInterval(function(){
+                count--;
+                if(count > 0){
+                    btn.text(count+"秒后重新获取");
+                }else{
+                    clearInterval(resend);
+                    btn.text("获取验证码").removeAttr('disabled style');
+                }
+            },1000);
+            btn.attr('disabled',true).css('cursor','not-allowed');
+        };
+    });
+</script>
+</body>
+</html>
+
+

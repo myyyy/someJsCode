@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <title>南京智慧排水监测管理系统</title>
+    <link href="src/images/favicon.ico" rel="shortcut icon" />
+    <link href="src/css/mylogin.css" rel="stylesheet" />
+    <link href="src/css/font-awesome.min.css" rel="stylesheet" />
+    <style type="text/css">
+        .login-message {
+            color: red;
+            width: 400px;
+            right: 36px;
+            text-align: center;
+            top: 400px;
+            position: absolute;
+            font-size: 14px;
+        }
+
+        .logo {
+            line-height: 80px;
+            color: white;
+        }
+
+        .login-wrap .login-ban img {
+            height: 480px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-outer">
+        <div class="header">
+            <a href="index.html">
+                <h1 class="logo">南京智慧排水监测管理系统</h1>
+            </a>
+        </div>
+    </div>
+
+    <div style="display: none;">
+        <form action="index.html" id="login_form" method="post">
+            <input id="loginType" name="loginType" type="text" value="password" />
+            <input id="username" name="username" type="text" />
+            <input id="password" name="password" type="password" />
+        </form>
+    </div>
+
+    <div class="login-outer">
+        <div class="login-wrap">
+            <div class="login-ban">
+                <img src="src/images/pc_office/2.jpg" />
+            </div>
+            <div class="login-zone">
+                <form>
+                    <div class="login-box" id="login">
+                        <dl>
+                            <dd class="active" style="width:100%;">帐号密码登录</dd>
+                            <!-- <dd>手机动态码登录</dd> -->
+                        </dl>
+                        <div class="account" loginType="password">
+                            <ul>
+                                <li><i class="fa fa-user"></i>
+                                    <input id="p_username" name="p_username" placeholder="请输入用户名" type="text" />
+                                </li>
+                                <li><i class="fa fa-lock"></i>
+                                    <input id="p_password" name="p_password" placeholder="请输入密码" type="password" />
+                                </li>
+                                <li class="verificationCode" style="display: none;"><i class="fa fa-shield"></i><input
+                                        placeholder="请输入验证码" type="text" /><span class="check-code">XD34F</span></li>
+                                <!--连续输入错误四次 第五次显示请验证验证码  浏览器关闭后重新记次数-->
+                            </ul>
+                            <h3 class="tips">
+                                <label><input checked="checked" type="checkbox" />记住用户名</label>
+                                <a class="registerIn" href="src/html/register/register.html"
+                                    targetType="iframe-tab">立即注册</a>
+                                <a class="forget-pwd" href="src/html/user/forgetpassword.html" target="_blank">忘记密码？</a>
+                            </h3>
+                            <a class="supplier" href="javascript:void(0);" onclick="login()" target="_self">登录</a>
+                        </div>
+                        <div class="mobile" loginType="sms">
+                            <ul>
+                                <li>
+                                    <i class="fa fa-mobile"></i>
+                                    <input id="s_username" name="s_username" placeholder="请输入手机号" type="text" />
+                                    <a class="getCode" href="javascript:;" id="getCode" onclick="getCode()">获取动态码</a>
+                                </li>
+                                <li>
+                                    <i class="fa fa-unlock-alt"></i>
+                                    <input id="s_password" name="s_password" placeholder="请输入动态码" type="text" />
+                                </li>
+                            </ul>
+                            <h3 class="tips">
+                                <label><input checked="checked" type="checkbox" />记住手机号</label>
+                            </h3>
+                            <a class="supplier" href="javascript:void(0);" onclick="login()" target="_self">登录</a>
+                        </div>
+                    </div>
+                    <div class="login-message">
+                        <span id="errorMsg"></span>
+                    </div>
+                    <input style="display: none;" type="submit" />
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="address">地址：北京市房山区卓秀北街8号院 &nbsp;邮编：102400</div>
+        <p>&nbsp;京ICP备案号：&nbsp;18020490&nbsp;&nbsp;&nbsp;Copyright&nbsp;©&nbsp;2015&nbsp;-&nbsp;2020&nbsp;&nbsp;版权所有</p>
+        <div class="other-info">E-mail：aaron_peng@foxmail.com</div>
+    </div>
+</body>
+</html>
+<!-- jQuery 2.2.3 -->
+<script src="src/plugins/jquery/jquery-2.2.3.min.js"></script>
+<script>
+    var oLogin = document.getElementById('login');
+    var aLoginDd = oLogin.getElementsByTagName('dd');
+    var aLoginDiv = oLogin.getElementsByTagName('div');
+    var getCodeTime = 0;
+
+    for (var i = 0; i < aLoginDd.length; i++) {
+        aLoginDd[i].index = i;
+        aLoginDd[i].onclick = function () {
+            for (var i = 0; i < aLoginDd.length; i++) {
+                aLoginDd[i].className = '';
+                aLoginDiv[i].style.display = 'none';
+            }
+            this.className = 'active';
+            aLoginDiv[this.index].style.display = 'block';
+            $('#loginType').val($(aLoginDiv[this.index]).attr('loginType'));
+        };
+    }
+
+    function login() {
+        var username = $('#p_username').val();
+        var password = $('#p_password').val();
+        if ($('#loginType').val() == 'sms') {
+            username = $('#s_username').val();
+            password = $('#s_password').val();
+        }
+        $('#username').val(username);
+        $('#password').val(password);
+        $('#login_form').submit();
+
+        location.href = "src/main.html";   //模拟登陆  跳转系统内部
+    }
+
+    function getCode() {
+        var tel = $('#s_username').val();
+        if (tel && getCodeTime == 0) {
+            $.ajax({
+                dataType: 'json',
+                url: "/anonController/sendLoginSms.json",
+                data: { tel, tel },
+                type: 'POST',
+                success: function (result) {
+                    if (result.code == '0') {
+                        $('#errorMsg').text();
+                        getCodeTime = 60;
+                    } else {
+                        $('#errorMsg').text(result.msg || '获取验证码失败');
+                    }
+                }
+            });
+        }
+    }
+
+    setInterval(function () {
+        var html = '获取动态码';
+        var active = true;
+        if (getCodeTime > 0) {
+            getCodeTime = getCodeTime - 1;
+            html = html + '(' + getCodeTime + ')';
+            active = false;
+        }
+        $('#getCode').html(html);
+        if (active) {
+            $('#getCode').attr('disabled', null);
+        } else {
+            $('#getCode').attr('disabled', 'disabled');
+        }
+    }, 1000);
+
+    document.onkeydown = function (event) {
+        var e = event || window.event;
+        if (e && e.keyCode == 13) {
+            login();
+        }
+    }
+</script>

@@ -1,0 +1,47 @@
+<style type="text/css">
+    #paramContainer {
+        width: 90%;
+        margin: 0px auto;
+        border-top: 1px dashed #ccc;
+    }
+
+    #receiver,
+    #templateContent {
+        width: 90%;
+        margin: 15px auto;
+        display: table;
+    }
+
+    .layui-form-item {
+        margin-bottom: 0px;
+        margin-top: 15px
+    }
+
+    #templateContent span {
+        display: table-cell
+    }
+
+    #receiver span {
+        display: table-cell
+    }
+</style>
+<div id="receiver"></div>
+<div id="templateContent"></div>
+<div id="paramContainer"></div>
+<script>
+    var getSelectedTableRows = null;
+    function selectedSmsTemplateIds() {
+        return getSelectedTableRows();
+    }
+    //表格渲染
+    layui.use(['layer', 'table', 'jquery'], function () {
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var table = layui.table;
+        //获取选中的短信模板
+        getSelectedTableRows = function getSelectedTableRows() {
+            var checkedRows = table.checkStatus('grid_table').data || [];
+            return checkedRows;
+        }
+    });
+</script>

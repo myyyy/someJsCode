@@ -1,0 +1,141 @@
+<!-- 日志编辑 -->
+<style>
+	.add {
+		margin: 0 8px 0;
+	}
+
+	.add .layui-form-item .layui-form-label {
+		width: 30%;
+		padding: 8px 15px;
+		text-align: left;
+	}
+
+	.add .layui-form-text .layui-form-label {
+		width: 100%;
+	}
+
+	.add .layui-form-item .layui-input-inline {
+		width: 70%;
+	}
+</style>
+<div class="main-content">
+	<input type="hidden" id="callBack" />
+	<div class="add layui-row layui-col-space10">
+		<div class="layui-col-md3">
+			<form id="addForm" class="layui-form layui-form-pane" action="">
+				<div class="divider">
+					<span class="fa fa-info-circle"> 基础信息</span>
+				</div>
+				<div class="layui-row">
+					<div class="layui-col-md12 form-item">
+						<label class="Font4 layui-form-label"> 日志编码</label>
+						<div class="layui-input-inline">
+							<input id="logId" name="logId" lay-verify="required" placeholder="日志编码" autocomplete="off"
+								class="layui-input" type="text">
+						</div>
+					</div>
+					<div class="layui-col-md12 form-item">
+						<label class="Font4 layui-form-label"> 日志名称</label>
+						<div class="layui-input-inline">
+							<input name="logName" lay-verify="required" placeholder="日志名称" autocomplete="off"
+								class="layui-input" type="text">
+						</div>
+					</div>
+					<div class="layui-form-item layui-form-text">
+						<label class="layui-form-label">日志内容</label>
+						<div class="layui-input-block">
+							<textarea name="logCaption" placeholder="日志内容" class="layui-textarea"></textarea>
+						</div>
+					</div>
+					<div style="display: none;">
+						<button class="lay-submit" lay-submit="" lay-filter="save"></button>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="layui-col-md9">
+			<div class="divider">
+				<span class="fa fa-info-circle">权限设置</span>
+			</div>
+			<div class="zTreeDemoBackground left">
+				<ul id="addJurisdiction" class="ztree"></ul>
+			</div>
+		</div>
+	</div>
+</div>
+<!--ZTree框架配置 -->
+<link rel="stylesheet" href="/plugins/ztree/css/metroStyle/metroStyle.css" type="text/css">
+<script type="text/javascript" src="/plugins/ztree/js/jquery.ztree.core.js"></script>
+<script type="text/javascript" src="/plugins/ztree/js/jquery.ztree.excheck.js"></script>
+<script type="text/javascript" src="/plugins/ztree/js/jquery.ztree.exedit.js"></script>
+<script type="text/javascript">
+	var setting = {
+		check: {
+			enable: true,
+			chkboxType: { "Y": "ps", "N": "s" }
+		},
+		data: {
+			simpleData: {
+				enable: true
+			}
+		}
+	};
+	function initPage(data) {
+		var params = {};
+		if (data) {
+			util.fillFormData($('#addForm'), data, $);
+			params = { logId: data.logId };
+			$('#logId').attr('disabled', 'disabled');
+		}
+		var zTree;
+		$.ajax({
+			dataType: 'json',
+			type: 'POST',
+			url: "/dubbo/sys/syslogManager/getMenuTreeBylogId.json",
+			data: params,
+			success: function (result) {
+				var zNodes = result.data;
+				zTree = $.fn.zTree.init($("#addJurisdiction"), setting, zNodes);
+			}
+		});
+
+		layui.use(['form', 'layedit'], function () {
+			var $ = layui.jquery, form = layui.form;
+
+			form.on("submit(save)", function (data) {
+				var index = layer.msg('提交中，请稍候', {
+					icon: 16,
+					time: false,
+					shade: 0.8
+				});
+
+				var selectedNodes = zTree.getCheckedNodes();
+				var params = data.field;
+				var indexM = 0, indexP = 0;
+				for (var i in selectedNodes) {
+					if (selectedNodes[i]['id']) {
+						var nodeData = selectedNodes[i];
+						if (nodeData['type'] && nodeData['type'] == 'perm') {
+							params['perms[' + indexP + '].id'] = nodeData['id'];
+							indexP++;
+						} else {
+							params['menus[' + indexM + '].menuId'] = nodeData['id'];
+							indexM++;
+						}
+					}
+				}
+				layer.ajax({
+					url: "/dubbo/sys/syslogManager/savelogAuth.json",
+					data: params,
+					success: function (result) {
+						layer.close(index);
+						$('#callBack').click();
+						var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+						parent.layer.close(index); //再执行关闭 
+					}
+				});
+				return false;
+			});
+		});
+	}
+</script>

@@ -1,0 +1,92 @@
+<!-- 添加栏目 -->
+<body style="padding: 10px">
+	<input type="hidden" id="callBack" />
+	<div class="add">
+		<form id="form_menu" class="layui-form layui-form-pane form_menu" action="">
+			<div class="layui-hide">
+				<input name="id" class="layui-input" type="text" />
+			</div>
+			<div class="layui-row">
+				<div class="layui-col-md4 layui-col-sm4 form-item">
+					<label class="layui-form-label">上级名称</label>
+					<div class="layui-input-inline">
+						<input id="parentName" disabled class="layui-input field-value" value=""></input>
+					</div>
+				</div>
+				<div class="layui-col-md4 layui-col-sm4 form-item">
+					<label class="layui-form-label">菜单名称</label>
+					<div class="layui-input-inline">
+						<input name="tel" lay-verify="required" placeholder="菜单名称" autocomplete="on" class="layui-input"
+							type="text" />
+					</div>
+				</div>
+				<div class="layui-col-md4 layui-col-sm4 form-item">
+					<label class="layui-form-label">菜单地址</label>
+					<div class="layui-input-inline">
+						<input name="url" placeholder="菜单地址" autocomplete="on" class="layui-input" type="text">
+					</div>
+				</div>
+				<div class="layui-col-md4 layui-col-sm4 form-item">
+					<label class="layui-form-label">菜单序号</label>
+					<div class="layui-input-inline">
+						<input name="order" value="99" lay-verify="number" placeholder="菜单序号" autocomplete="on"
+							class="layui-input" type="text">
+					</div>
+				</div>
+				<div class="layui-col-md4 layui-col-sm4 form-item" id="changeIcoID">
+					<label class="layui-form-label">图标：</label>
+					<label class="changeICO" style="width: 250px;">
+						<a href="javascript:;" class="change" data-method="change">
+							<i id="tubiao_show" class="fa fa-file-zip-o" aria-hidden="true"></i>更换
+						</a>
+					</label>
+				</div>
+				<div class="layui-col-md4 layui-col-sm4 form-item">
+					<label class="layui-form-label">菜单样式</label>
+					<div class="layui-input-block">
+						<input name="icon" value="" class="layui-input field-value">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-input-block">
+						<button class="layui-btn" lay-submit="" lay-filter="addMenu">新增菜单</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</body>
+<script type="text/javascript">
+	layui.use(['form', 'layer'], function () {
+		var contextPath = '${pageContext.request.contextPath}';
+		var layer = layui.layer, form = layui.form, $ = layui.jquery;
+		form.on("submit(addMenu)", function (data) {
+			var index = layer.msg('提交中，请稍候', {
+				icon: 16,
+				time: false,
+				shade: 0.8
+			});
+			$.ajax({
+				type: 'POST',
+				url: contextPath + "/security/sysMenu/saveSysMenu.json",
+				data: data.field,
+				success: function (result) {
+					if (result.code && result.message) {
+						layer.alert(result.message);
+					} else {
+						layer.close(index);
+						$('#callBack').click();
+						var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+						parent.layer.close(index); //再执行关闭 
+					}
+				},
+				error: function (e) {
+					console.log(e);
+					layer.close(index);
+					layer.alert("系统异常!");
+				}
+			});
+			return false;
+		});
+	});
+</script>

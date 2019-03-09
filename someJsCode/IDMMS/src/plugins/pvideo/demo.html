@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="css/video.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="../../js/zepto.min.js"></script>
+    <script type="text/javascript" src="js/pvideo.js"></script>
+</head>
+<body>
+    <input type="button" id="bt1" value="切换其他视频" />
+    <div id="divVideo" style="width:100%;height:540px;"></div>
+  
+    <script type="text/javascript"> 
+        function formatSeconds(value) {
+            var theTime = parseInt(value); // 秒 
+            var theTime1 = 0; // 分 
+            var theTime2 = 0; // 小时 
+            // alert(theTime); 
+            if (theTime > 60) {
+                theTime1 = parseInt(theTime / 60);
+                theTime = parseInt(theTime % 60);
+                // alert(theTime1+"-"+theTime); 
+                if (theTime1 > 60) {
+                    theTime2 = parseInt(theTime1 / 60);
+                    theTime1 = parseInt(theTime1 % 60);
+                }
+            }
+            var result = "" + parseInt(theTime) + "秒";
+            if (theTime1 > 0) {
+                result = "" + parseInt(theTime1) + "分" + result;
+            }
+            if (theTime2 > 0) {
+                result = "" + parseInt(theTime2) + "小时" + result;
+            }
+            return result;
+        }
+
+        $('#divVideo').pvideo({
+            src: "1.3gp",
+            preload: "true",
+            autoplay: "false",
+            poster: "",
+//            width: "",
+            height: "540px"
+            , timeupdate: function (obj) {
+                var currentTime = obj.srcElement.currentTime;
+                var duration = obj.srcElement.duration;
+                var ct = formatSeconds(currentTime);
+                var dt = formatSeconds(duration);
+                $('#div1').html((ct) + "/" + (dt));
+            }, play: function (obj) {
+                $('#div2').html('播放中...');
+            }, pause: function (obj) {
+                $('#div2').html('pause');
+            }, ended: function (obj) {
+                $('#div2').html('ended');
+            }, durationchange: function (obj) {
+                $('#div2').html('durationchange');
+            }
+        });
+        $('#bt1').click(function () {
+            var newsrc = "2.3gp";
+            $('#divVideo').data('playVideo').loadnew(newsrc,1);
+//            $('#divVideo').data('playVideo').media.play();
+        });
+    </script>
+    <div id="div1">aa</div>   <div id="div2">bb</div>
+</body>
+</html>

@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>新用户注册</title>
+    <link rel="shortcut icon" href="/static/system/image/favicon.ico" />
+	<link rel="stylesheet" href="/static/system/style/mylogin.css" />
+    <style>
+    	.layui-upload-file{
+    		display:none;
+    	}
+    	.layui-unselect{
+    		display:none;
+    	}
+    </style>
+</head>
+<body>
+<div class="header-outer">
+		<div class="header">
+			<h1 class="logo">
+				<a href="../index.html"><img src="/static/system/image/logo.png" /></a>
+			</h1>
+		</div>
+	</div>
+
+<div class="register">
+    <div class="register01" id="firstStep">
+        <h3>新用户注册</h3>
+        <div class="registerTab" id="registerTab">
+            <dl>
+                <dd class="active">企业货主</dd>
+                <dd>企业承运商</dd>
+                <dd>个人承运商</dd>
+            </dl>
+            <input type="hidden" id="companyCheckCode" value=""/><!-- 企业货主验证码 -->
+            <input type="text" id="carrierCheckCode" value=""/><!-- 企业承运商验证码 -->
+            <input type="hidden" id="personCheckCode"  value=""/><!-- 个人承运商验证码 -->
+            <form id="biz_consignor_form" style="display: block;" class="layui-form">
+                <h4 class="owner show" id="owner">
+                    <input type="hidden" name="idType" value="20"/>
+                    <input type="hidden" name="companyType" value="01"/>
+                    <input type="hidden" name="sourceType" value="20"/>
+                    <input type="hidden" id="businessLicense" name="businessLicense" value=""/>
+                    <input type="hidden" name="companyCode" value="00000000"/>
+                    <input type="hidden" name="englishShortName" value="register"/>
+                    <div class="group">
+                        <label>企业名称:</label>
+                        <input type="text" class="input-control layui-input" id="bizConsName" name="companyName"placeholder="请输入企业名称"/>
+                    </div>
+                    <div class="group">
+                        <label>企业简称:</label>
+                        <input type="text" class="input-control layui-input" id="bizShortName" name="shortName"placeholder="请输入企业简称"/>
+                    </div>
+                    <div class="group">
+                        <label>企业地址:</label>
+                        <input type="text" class="input-control layui-input" id="bizConsAddress" name="address" placeholder="请输入企业地址"/>
+                    </div>
+                    <div class="group">
+                        <label>纳税人识别号:</label>
+                        <input type="text" class="input-control layui-input" id="bizConsIdNo" name="idNo" placeholder="请输入纳税人识别号">
+                    </div>
+                    <div class="group">
+                        <label>联系人:</label>
+                        <input type="text" class="input-control layui-input" id="bizConsContactsName" name="contactsName" placeholder="请输入联系人姓名">
+                    </div>
+                    <div class="group">
+                        <label>手机号:</label>
+                        <input type="text" class="input-control layui-input" id="bizConsConsignorTel" name="contactsTel" placeholder="请输入您的手机号">
+                    </div>
+                    <div class="group">
+                        <label>短信验证码:</label>
+                        <input type="text" class="input-control wth65 " id="bizConsAuthCode" name="authCode" placeholder="请输入短信验证码">
+                        <i class="captcha">
+                            <button type="button" class="btn btn-blue" id="bizConsCaptchaBtn">获取验证码</button>
+                        </i>
+                    </div>
+                    <div class="tips">
+                        <label><input type="checkbox" id="bizConsAgreement"><a href="javascript:;" id="Agree">同意服务条款</a>
+                        </label>
+                    </div>
+                    <a href="javascript:;" class="btn" id="nextStep">下一步</a>
+                </h4>
+                <!--企业货主资质-->
+                <div class="Aptitudes hide" id="FirmShipper">
+                    <!--<h3>上传资质</h3>-->
+                    <div class="upload">
+                        <div class="upload-block">
+                            <strong>请上传营业执照</strong>
+                            <div class="photo" >
+                            	<img id="UpImg" src="/static/system/image/BusinessLicense00.jpg"/>
+                            </div>
+                            <div class="btnX">
+                                <a href="javascript:" class="file" id="btnOne" >选择图片</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn">
+                        <a class="lastStep" id="lastStep" href="javascript:;">上一步</a>
+                        <a class="nextStep" id="register01" lay-filter="register01" href="javascript:" lay-submit="">立即注册</a>
+                    </div>
+                </div>
+            </form>
+            <!-- ------------------------------------------------------------企业承运商---------------------------------------------------------------------- -->
+            <form id="biz_carrier_form" class="layui-form">
+                <h4 class="SCarrier show" id="SCarrier">
+                    <input type="hidden" name="idType" value="20"/>
+                    <input type="hidden" name="sourceType" value="20"/>
+                    <input type="hidden" name="type" value="10"/>
+                    <input type="hidden" name="carrierCode" value="00000000"/>
+                    <input type="hidden" id="licenseOneUrl" name="licenseOneUrl" value=""/>
+                    <input type="hidden" id="licenseTwoUrl" name="licenseTwoUrl" value=""/>
+                    <div class="group">
+                        <label>企业名称:</label>
+                        <input type="text" class="input-control" id="bizCarrName" name="carrierName" placeholder="请输入企业名称"/>
+                    </div>
+                    <div class="group">
+                        <label>企业简称:</label>
+                        <input type="text" class="input-control" id="bizCarrShortName" name="carrierShortName" placeholder="请输入企业简称"/>
+                    </div>
+                    <div class="group">
+                        <label>企业地址:</label>
+                        <input type="text" class="input-control" id="bizCarrAddress" name="address" placeholder="请输入企业地址"/>
+                    </div>
+                    <div class="group">
+                        <label>纳税人识别号:</label>
+                        <input type="text" class="input-control" id="bizCarrIdNo" name="idNo" placeholder="请输入纳税人识别号">
+                    </div>
+                    <div class="group">
+                        <label>联系人:</label>
+                        <input type="text" class="input-control" id="bizCarrContactsName" name="contactsName" placeholder="请输入联系人姓名">
+                    </div>
+                    <div class="group">
+                        <label>手机号:</label>
+                        <input type="text" class="input-control" id="bizCarrContactsTel" name="contactsPhone" placeholder="请输入您的手机号">
+                    </div>
+                    <div class="group">
+                        <label>短信验证码:</label>
+                        <input type="text" class="input-control wth65" id="bizCarrAuthCode" name="authCode" placeholder="请输入短信验证码">
+                        <i class="captcha">
+                            <button type="button" class="btn btn-blue" id="bizCarrCaptchaBtn">获取验证码</button>
+                        </i>
+                    </div>
+                    <div class="tips">
+                        <label><input type="checkbox" id="bizCarrAgreement"><a href="javascript:;" id="Agree2">同意服务条款</a>
+                        </label>
+                    </div>
+                    <a href="javascript:;" class="btn" id="nextStep2">下一步</a>
+                </h4>
+                <!--企业承运商资质-->
+                <div class="Aptitudes hide" id="FirmCarrier">
+                    <!--<h3>上传资质</h3>-->
+                    <div class="upload">
+                        <div class="upload-block">
+                            <strong>请上传营业执照</strong>
+                            <div class="photo" ><img id="UpImg2" src="/static/system/image/BusinessLicense00.jpg"/>
+                            </div>
+                            <div class="btnX">
+                                <a href="javascript:" class="file" id="btnTwo" >选择图片</a>                                                
+                            </div>
+                        </div>
+                        <div class="upload-block">
+                            <strong>请上传道路运输许可证</strong>
+                            <div class="photo" ><img id="UpImg2_2" src="/static/system/image/RoadTransport00.jpg"/></div>
+                            <div class="btnX">
+                                <a href="javascript:" class="file" id="btnThree" >选择图片</a> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn">
+                        <a class="lastStep" id="lastStep2" href="javascript:;">上一步</a>
+                        <a class="nextStep" id="register02" lay-filter="register02" href="javascript:" lay-submit="">立即注册</a>
+                    </div>
+                </div>
+            </form>
+            <!-- ---------------------------------------------------个人承运商----------------------------------------------------------------- -->
+            <form id="ind_carrier_form" class="layui-form">
+                <h4 class="ACarrier show" id="ACarrier">
+                    <input type="hidden" name="idType" value="10"/>
+                    <input type="hidden" name="sourceType" value="20"/>
+                    <input type="hidden" name="type" value="20"/>
+                    <input type="hidden" name="carrierCode" value="00000000"/>
+                    <input type="hidden" id="licenseOneUrl" name="licenseOneUrl" value=""/>
+                    <input type="hidden" id="licenseTwoUrl" name="licenseTwoUrl" value=""/>
+                    <div class="group">
+                        <label>姓名:</label>
+                        <input type="text" class="input-control" id="indCarrContactsName" name="carrierName" placeholder="请输入姓名"/>
+                    </div>
+                    <div class="group">
+                        <label>简称:</label>
+                        <input type="text" class="input-control" id="indCarrShortName" name="carrierShortName" placeholder="请输入简称"/>
+                    </div>
+                    <div class="group">
+                        <label>身份证号:</label>
+                        <input type="text" class="input-control" id="indIdNo" name="idNo" placeholder="请输入身份证号">
+                    </div>
+                    <div class="group">
+                        <label>手机号:</label>
+                        <input type="text" class="input-control" id="indContactsTel" name="contactsPhone" placeholder="请输入手机号"/>
+                    </div>
+                    <div class="group">
+                        <label>短信验证码:</label>
+                        <input type="text" class="input-control wth65" id="indAuthCode" name="authCode" placeholder="请输入短信验证码">
+                        <i class="captcha">
+                            <button type="button" class="btn btn-blue" id="indCarrCaptchaBtn">获取验证码</button>
+                        </i>
+                    </div>
+                    <div class="tips">
+                        <label><input type="checkbox" id="indCarrAgreement"><a href="javascript:;" id="Agree3">同意服务条款</a>
+                        </label>
+                    </div>
+                    <a href="javascript:;" class="btn" id="nextStep3">下一步</a>
+                </h4>
+                <!--个人承运商资质-->
+                <div class="Aptitudes hide" id="FirmPerson">
+                    <!--<h3>上传资质</h3>-->
+                    <div class="upload">
+                        <div class="upload-block">
+                            <strong>请上传身份证正面</strong>
+                            <div class="photo" >
+                            	<img id="UpImg3" src="/static/system/image/IDCardA.jpg"/>
+                            </div>
+                            <div class="btnX">
+                                <a href="javascript:" class="file" id="btnFour" >选择图片</a> 
+                            </div>
+                        </div>
+                        <div class="upload-block">
+                            <strong>请上传身份证反面</strong>
+                            <div class="photo" ><img id="UpImg3_2" src="/static/system/image/IDCardB.jpg"/></div>
+                            <div class="btnX">
+                                <a href="javascript:" class="file" id="btnFive" >选择图片</a> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn">
+                        <a class="lastStep" id="lastStep3" href="javascript:;">上一步</a>
+                        <a class="nextStep" id="register03" lay-filter="register03" href="javascript:" lay-submit="">立即注册</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--服务条款-->
+<div class="popup" id="popup">
+    <div class="clause">
+        <h4>服务协议 <span class="close" id="close">×</span></h4>
+        <div class="modal-body">
+            <p>1、企业服务协议企业服务协议企业服务协议企业服务协议企业服务协议企业服务协议企业服务协议企业服务协议企业服务协议企业服务协议企业服务协议企业服务协议企业服务协议企业服务协议...</p>
+            <p>2、企业...</p>
+            <p>3、企业...</p>
+            <p>4、企业...</p>
+            <p>5、企业...</p>
+        </div>
+    </div>
+</div>
+<!--注册成功弹窗-->
+<div class="popup" id="succeed">
+    <div class="clause clauseSucceed">
+        <h4>注册成功 <span class="close" id="close2">×</span></h4>
+        <div class="succeed-content">
+            <p>恭喜您，恭喜您注册成功!</p>
+            <p><span id="num">5</span>秒后自动返回首页</p>
+        </div>
+    </div>
+</div>
+<div class="popup" id="fail">
+    <div class="clause clauseSucceed">
+        <h4>注册失败 <span class="close" id="close3">×</span></h4>
+        <div class="succeed-content">
+            <p><span id="registerType"></span></p>
+            <p><span id="errorMsg"></span></p>
+        </div>
+    </div>
+</div>
+<script src="/static/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<script src="/static/plugins/form/jquery.form.js" ></script>
+<script src="/static/layui/layui.js" ></script>
+
+<script th:inline="javascript">
+	function getPath(){
+		var fullpath = window.document.location.href;
+		var pathName = window.document.location.pathname; 
+		var pos = fullpath.indexOf(pathName);
+		return fullpath.substring(0,pos);
+	}
+    layui.use(['layer', 'form', 'upload'], function(){
+	    //var _gateway =getPath();
+	    
+        var layer = layui.layer,
+            form = layui.form;
+        	$ = layui.$;
+        	upload = layui.upload;
+        //tab切换
+        var oRegisterTab = document.getElementById('registerTab');
+        var aRegisterDd = oRegisterTab.getElementsByTagName('dd');
+        var aRegisterTabForm = oRegisterTab.getElementsByTagName('form');
+        var regIdNo = /^[a-zA-Z0-9]{18}$/;
+        var ratepayingNo = /(^[a-zA-Z0-9]{18}$)|(^[a-zA-Z0-9]{15}$)|(^[a-zA-Z0-9]{20}$)/;
+        var regTel = /^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9])\d{8}$/;
+        for (var i = 0; i < aRegisterDd.length; i++) {
+            aRegisterDd[i].index = i;
+            aRegisterDd[i].onclick = function () {
+                for (var i = 0; i < aRegisterDd.length; i++) {
+                    aRegisterDd[i].className = '';
+                    aRegisterTabForm[i].style.display = 'none';
+                }
+                this.className = 'active';
+                aRegisterTabForm[this.index].style.display = 'block';
+            };
+        }
+
+        // 企业货主--发送验证码
+        $('#bizConsCaptchaBtn').click(function(){
+            var tel = $("#bizConsConsignorTel").val();
+            if(tel == null || tel == '') {
+                layer.tips("手机号码不能为空", '#bizConsConsignorTel');
+                return;
+            }else if(!regTel.test(tel)){
+                layer.tips("手机号码格式不正确", '#bizConsConsignorTel');
+                return;
+            }else{
+            	$.ajax({
+                   url: "/register/sendPhoneNum.json", 
+                   type: "post",
+                   data: {phoneNum:tel},
+                   success: function (data) {
+                       captcha("bizConsCaptchaBtn",60);
+                	   var obj = eval('('+data+')');
+                	   if(obj.result=='SUCCESS'){
+	                	   $("#companyCheckCode").val(obj.checkCode);
+	                       setTimeout("document.getElementById('companyCheckCode').value=''",1000*60*5);
+                	   }else{
+                     	  layer.tips("获取验证码失败，请重新获取!", '#bizConsAuthCode');
+                       }
+                   },
+                   error:function(){
+                	   layer.tips("获取验证码失败，请重新获取!", '#bizConsAuthCode');
+                   },
+                   
+                });
+            }
+        });
+        //企业货主--上一步下一步切换
+        $("#nextStep").on("click",function(){
+            if(!checkBizConsignor()){
+                return;
+            }
+            $("#owner").removeClass().addClass("owner hide");
+            $("#FirmShipper").removeClass().addClass("Aptitudes show");
+        });
+
+        $("#lastStep").on("click",function(){
+            $("#owner").removeClass().addClass("owner show");
+            $("#FirmShipper").removeClass().addClass("Aptitudes hide");
+            aRegisterDd[0].className = 'active';
+        });
+
+        //企业货主数据检查
+        function checkBizConsignor(){
+            var companyName = $("#bizConsName").val();
+            var shortName = $("#bizShortName").val();
+            var address = $("#bizConsAddress").val();
+            var idNo = $("#bizConsIdNo").val();
+            var contactsName = $("#bizConsContactsName").val();
+            var contactsTel = $("#bizConsConsignorTel").val();
+            var authCode = $("#bizConsAuthCode").val();
+            var checkCode = $("#companyCheckCode").val();
+            var flag = false;
+            if(companyName == null || companyName == ""){
+                layer.tips("企业名称不能为空", '#bizConsName');
+                return false;
+            }else if(companyName != undefined && companyName.length > 60){
+                layer.tips("企业名称输入过长，最大输入长度60位","#bizConsName");
+                return false;
+            }
+            if(shortName == null || shortName == ""){
+                layer.tips("企业简称不能为空", '#bizShortName');
+                return false;
+            }else if(shortName != undefined && shortName.length > 10){
+                layer.tips("企业简称输入过长，最大输入长度10位","#bizShortName");
+                return false;
+            }
+            if(address == null || address == ""){
+                layer.tips("企业地址不能为空", '#bizConsAddress');
+                return false;
+            }else if(address != undefined && address.length > 240){
+                layer.tips("企业地址输入过长，最大输入长度240位","#bizConsAddress");
+                return false;
+            }
+            if(idNo == null || idNo == ""){
+                layer.tips("纳税人识别号不能为空", '#bizConsIdNo');
+                return false;
+            }else if(!ratepayingNo.test(idNo)){
+                layer.tips("纳税人识别号只能输入英数字并且最大长度为20位","#bizConsIdNo");
+                return false;
+            }else if(exsitNumberWasUse("idNo",idNo,'01')){
+            	layer.tips("该号码已注册，请更换信息，再注册！", '#bizConsIdNo');
+            	return false;
+            }
+            if(contactsName == null || contactsName == ""){
+                layer.tips("联系人不能为空", '#bizConsContactsName');
+                return false;
+            }else if(contactsName != undefined && contactsName.length > 50){
+                layer.tips("联系人输入过长，最大输入长度50位","#bizConsContactsName");
+                return false;
+            }
+            if(contactsTel == null || contactsTel == ""){
+                layer.tips("手机号不能为空", '#bizConsConsignorTel');
+                return false;
+            }else if(!regTel.test(contactsTel)){
+                layer.tips("手机号格式输入错误","#bizConsConsignorTel");
+                return false;
+            }else if(exsitNumberWasUse("contactsTel",contactsTel,'01')){
+            	layer.tips("该号码已注册，请更换信息，再注册！", '#bizConsConsignorTel');
+            	return false;
+            }
+            /* */
+            
+            if(authCode == null || authCode == ""){
+                layer.tips("短信验证码不能为空", '#bizConsAuthCode');
+                return false;
+            }else{
+            	if(checkCode == ""){
+            		$("#bizConsAuthCode").val("");
+            		layer.msg("短信验证码已过期，请重新获取!");
+            		return false;
+            	}else if(checkCode != authCode){
+            		$("#bizConsAuthCode").val("");
+            		layer.tips("短信验证码错误，请重新填写!", '#bizConsAuthCode');
+            		return false;
+            	}
+            	
+            }
+            
+            if(!$("#bizConsAgreement").prop('checked')){
+                layer.tips("请查看同意服务条款，并且勾选", '#Agree');
+                $(".layui-layer.layui-layer-tips").last().css("top",$("#Agree").offset().top-11);
+                return false;
+            }
+            return true;
+        }
+
+        //企业货主注册
+        form.on("submit(register01)", function (data) {
+        	if($.trim($("#businessLicense").val()) == ''){
+                layer.tips("请上传营业执照", '#btnOne');
+                return;
+            }
+        	var dat = data.field;
+            /*
+            */
+            var index = layer.msg('提交中，请稍候', {
+                icon: 16,
+                time: false,
+                shade: 0.8
+            });
+            layer.ajax({
+                url: "/register/registerCmpCompany.json",
+                data: data.field,
+                success: function (result) {
+                    layer.msg("注册申请已提交，信息审核中!",{shift:-1},function(){
+	                   history.go(-1);
+                    });
+                }
+            });
+            return false;
+        });
+      
+        
+        /*****************************************************************企业承运商开始********************************************************************/
+        //企业承运商
+        $('#bizCarrCaptchaBtn').click(function(){
+            var tel = $("#bizCarrContactsTel").val();
+            if(tel == null || tel == '') {
+                layer.tips("手机号码不能为空", '#bizCarrContactsTel');
+                return;
+            }else if(!regTel.test(tel)){
+                layer.tips("手机号码格式不正确", '#bizCarrContactsTel');
+                return;
+            }else{
+                $.ajax({
+                    url: "/register/sendPhoneNum.json", 
+                    type: "post",
+                    data: {phoneNum:tel},
+                    success: function (data) {
+                       captcha("bizCarrCaptchaBtn",60);
+                       var obj = eval('('+data+')');
+                 	   if(obj.result=='SUCCESS'){
+ 	                	   $("#carrierCheckCode").val(obj.checkCode);
+                        	setTimeout("document.getElementById('carrierCheckCode').value=''",1000*60*5);
+                 	   }else{
+                     	  layer.tips("获取验证码失败，请重新获取!", '#bizConsAuthCode');
+                       }
+                    },
+                    error:function(){
+                 	   layer.tips("获取验证码失败，请重新获取!", '#bizConsAuthCode');
+                    },
+                    
+                 });
+            }
+        });
+
+        //企业承运商--上一步下一步切换
+        $("#nextStep2").on("click",function(){
+            if(!checkBizCarrier()){
+                return;
+            }
+            $("#SCarrier").removeClass().addClass("SCarrier hide");
+            $("#FirmCarrier").removeClass().addClass("Aptitudes show");
+        });
+
+        $("#lastStep2").on("click",function(){
+            $("#SCarrier").removeClass().addClass("SCarrier show");
+            $("#FirmCarrier").removeClass().addClass("Aptitudes hide");
+            aRegisterDd[1].className = 'active';
+        });
+
+        //企业承运商数据检查
+        function checkBizCarrier(){
+            var companyName = $("#bizCarrName").val();
+            var carrShortName = $("#bizCarrShortName").val();
+            var address = $("#bizCarrAddress").val();
+            var idNo = $("#bizCarrIdNo").val();
+            var contactsName = $("#bizCarrContactsName").val();
+            var contactsTel = $("#bizCarrContactsTel").val();
+            var authCode = $("#bizCarrAuthCode").val();
+            var checkCode = $("#carrierCheckCode").val();
+            if(companyName == null || companyName == ""){
+                layer.tips("企业名称不能为空", '#bizCarrName');
+                return false;
+            }else if(companyName != undefined && companyName.length > 60){
+                layer.tips("企业名称输入过长，最大输入长度60位","#bizCarrName");
+                return false;
+            }
+            if(carrShortName == null || carrShortName == ""){
+                layer.tips("企业简称不能为空", '#bizCarrShortName');
+                return false;
+            }else if(carrShortName != undefined && carrShortName.length > 10){
+                layer.tips("企业简称输入过长，最大输入长度10位","#bizCarrShortName");
+                return false;
+            }
+            if(address == null || address == ""){
+                layer.tips("企业地址不能为空", '#bizCarrAddress');
+                return false;
+            }else if(address != undefined && address.length > 240){
+                layer.tips("企业地址输入过长，最大输入长度240位","#bizCarrAddress");
+                return false;
+            }
+            if(idNo == null || idNo == ""){
+                layer.tips("纳税人识别号不能为空", '#bizCarrIdNo');
+                return false;
+            }else if(!ratepayingNo.test(idNo)){
+                layer.tips("纳税人识别号只能输入英数字并且最大长度为20位","#bizCarrIdNo");
+                return false;
+            }else if(exsitNumberWasUse("idNo",idNo,'02')){
+            	layer.tips("该号码已注册，请更换信息，再注册！", '#bizCarrIdNo');
+            	return false;
+            }
+            if(contactsName == null || contactsName == ""){
+                layer.tips("联系人不能为空", '#bizCarrContactsName');
+                return false;
+            }else if(contactsName != undefined && contactsName.length > 50){
+                layer.tips("联系人输入过长，最大输入长度50位","#bizCarrContactsName");
+                return false;
+            }
+            if(contactsTel == null || contactsTel == ""){
+                layer.tips("手机号不能为空", '#bizCarrContactsTel');
+                return false;
+            }else if(!regTel.test(contactsTel)){
+                layer.tips("手机号格式输入错误","#bizCarrContactsTel");
+                return false;
+            }else if(exsitNumberWasUse("contactsPhone",contactsTel,'02')){
+            	layer.tips("该号码已注册，请更换信息，再注册！", '#bizCarrContactsTel');
+            	return false;
+            }
+            
+            if(authCode == null || authCode == ""){
+                layer.tips("短信验证码不能为空", '#bizCarrAuthCode');
+                return false;
+            }else{
+            	if(checkCode == ""){
+            		$("#bizCarrAuthCode").val("");
+            		layer.msg("短信验证码已过期，请重新获取!");
+            		return false;
+            	}else if(checkCode != authCode){
+            		$("#bizCarrAuthCode").val("");
+            		layer.tips("短信验证码错误，请重新填写!", '#bizCarrAuthCode');
+            		return false;
+            	}
+            	
+            }
+            if(!$("#bizCarrAgreement").prop('checked')){
+                layer.tips("请查看同意服务条款，并且勾选", '#Agree2');
+                $(".layui-layer.layui-layer-tips").last().css("top",$("#Agree2").offset().top-11);
+                return false;
+            }
+            return true;
+        }
+
+        //企业承运商注册
+        form.on("submit(register02)", function (data) {
+        	if($.trim($("#licenseOneUrl").val()) == ''){
+                layer.tips("请上传营业执照", '#btnTwo');
+                return;
+            }
+            if($.trim($("#licenseTwoUrl").val()) == ''){
+                layer.tips("请上传道路运输许可证", '#btnThree');
+                return;
+            }
+        	var dat = data.field;
+        	console.log(JSON.stringify(dat));
+            /* */
+            var index = layer.msg('提交中，请稍候', {
+                icon: 16,
+                time: false,
+                shade: 0.8
+            });
+            layer.ajax({
+                url: "/register/registerCmpCarrier.json",
+                data: data.field,
+                success: function (result) {
+                	layer.msg("注册申请已提交，信息审核中!",{shift:-1},function(){
+ 	                   history.go(-1);
+                     });
+                }
+            });
+            return false;
+        });
+
+        /*****************************************************************个人承运商********************************************************************/
+        //个人承运商
+        $('#indCarrCaptchaBtn').click(function(){
+            var tel = $("#indContactsTel").val();
+            if(tel == null || tel == '') {
+                layer.tips("手机号码不能为空", '#indContactsTel');
+                return;
+            }else if(!regTel.test(tel)){
+                layer.tips("手机号码格式不正确", '#indContactsTel');
+                return;
+            }else{
+                $.ajax({
+                    url: "/register/sendPhoneNum.json", 
+                    type: "post",
+                    data: {phoneNum:tel},
+                    success: function (data) {
+                       captcha("indCarrCaptchaBtn",60);
+                       var obj = eval('('+data+')');
+                  	   if(obj.result=='SUCCESS'){
+  	                	   $("#personCheckCode").val(obj.checkCode);
+                         	setTimeout("document.getElementById('personCheckCode').value=''",1000*60*5);
+                  	   }else{
+                      	  layer.tips("获取验证码失败，请重新获取!", '#bizConsAuthCode');
+                        }
+                    },
+                    error:function(){
+                 	   layer.tips("获取验证码失败，请重新获取!", '#bizConsAuthCode');
+                    },
+                    
+                 });
+            }
+        });
+
+        //个人承运商--上一步下一步切换
+        $("#nextStep3").on("click",function(){
+            if(!checkIndCarrier()){
+                return;
+            }
+            $("#ACarrier").removeClass().addClass("ACarrier hide");
+            $("#FirmPerson").removeClass().addClass("Aptitudes show");
+        });
+
+        $("#lastStep3").on("click",function(){
+            $("#ACarrier").removeClass().addClass("ACarrier show");
+            $("#FirmPerson").removeClass().addClass("Aptitudes hide");
+            aRegisterDd[2].className = 'active';
+        });
+
+        //个人承运商数据检查
+        function checkIndCarrier(){
+            var companyName = $("#indCarrContactsName").val();
+            var personShortName = $("#indCarrShortName").val();
+            var idNo = $("#indIdNo").val();
+            var contactsTel = $("#indContactsTel").val();
+            var authCode = $("#indAuthCode").val();
+			var checkCode = $("#personCheckCode").val();          
+            if(companyName == null || companyName == ""){
+                layer.tips("姓名不能为空", '#indCarrContactsName');
+                return false;
+            }else if(companyName != undefined && companyName.length > 10){
+                layer.tips("姓名输入过长，最大输入长度10位","#indCarrContactsName");
+                return false;
+            }
+            if(personShortName == null || personShortName == ""){
+                layer.tips("简称不能为空", '#indCarrShortName');
+                return false;
+            }else if(personShortName != undefined && personShortName.length > 10){
+                layer.tips("简称输入过长，最大输入长度10位","#indCarrShortName");
+                return false;
+            }
+            if(idNo == null || idNo == ""){
+                layer.tips("身份证号不能为空", '#indIdNo');
+                return false;
+            }else if(!regIdNo.test(idNo)){
+                layer.tips("身份证号只能输入英数字并且最大长度为18位","#indIdNo");
+                return false;
+            }else if(exsitNumberWasUse("idNo",idNo,'02')){
+            	layer.tips("该号码已注册，请更换信息，再注册！", '#indIdNo');
+            	return false;
+            }
+            if(contactsTel == null || contactsTel == ""){
+                layer.tips("手机号不能为空", '#indContactsTel');
+                return false;
+            }else if(!regTel.test(contactsTel)){
+                layer.tips("手机号格式输入错误","#indContactsTel");
+                return false;
+            }else if(exsitNumberWasUse("contactsPhone",contactsTel,'02')){
+            	layer.tips("该号码已注册，请更换信息，再注册！", '#indContactsTel');
+            	return false;
+            }
+            if(authCode == null || authCode == ""){
+                layer.tips("短信验证码不能为空", '#indAuthCode');
+                return false;
+            }else{
+            	if(checkCode == ""){
+            		$("#indAuthCode").val("");
+            		layer.msg("短信验证码已过期，请重新获取!");
+            		return false;
+            	}else if(checkCode != authCode){
+            		$("#indAuthCode").val("");
+            		layer.tips("短信验证码错误，请重新填写!", '#indAuthCode');
+            		return false;
+            	}
+            }
+            if(!$("#indCarrAgreement").prop('checked')){
+                layer.tips("请查看同意服务条款，并且勾选", '#Agree3');
+                $(".layui-layer.layui-layer-tips").last().css("top",$("#Agree3").offset().top-11);
+                return false;
+            }
+            return true;
+        }
+
+        //个人承运商注册
+        form.on("submit(register03)", function (data) {
+        	if($.trim($("#licenseOneUrl").val()) == ''){
+                layer.tips("请上传身份证正面", '#btnFour');
+                return;
+            }
+            if($.trim($("#licenseTwoUrl").val()) == ''){
+            	layer.tips("请上传身份证反面", '#btnFive');
+                return;
+            }
+        	var dat = data.field;
+        	//console.log(JSON.stringify(dat));
+            /* */
+            var index = layer.msg('提交中，请稍候', {
+                icon: 16,
+                time: false,
+                shade: 0.8
+            });
+            layer.ajax({
+                url: "/register/registerCmpCarrier.json",
+                data: data.field,
+                success: function (result) {
+                	layer.msg("注册申请已提交，信息审核中!",{shift:-1},function(){
+ 	                   history.go(-1);
+                     });
+                }
+            });
+            return false;
+        });
+        
+        
+        
+        
+        //点击获取验证码后button倒计时有效期
+        function captcha(btnId,cnt) {
+            var btn = $('#'+ btnId);
+            var count = cnt;
+            var resend = setInterval(function(){
+                count--;
+                if(count > 0){
+                    btn.text(count+"秒后重新获取");
+                }else{
+                    clearInterval(resend);
+                    btn.text("获取验证码").removeAttr('disabled style');
+                }
+            },1000);
+            btn.attr('disabled',true).css('cursor','not-allowed');
+        }
+
+        function succeedMsg(){
+            $("#succeed").css("display","block");
+            var num = document.getElementById('num');
+            var startNum = 5;
+            setInterval(function () {
+                if (startNum > 1) {
+                    startNum--;
+                    num.innerHTML= startNum;
+                } else {
+                    location.href = "../login.html";
+                }
+            }, 1000)
+        }
+
+        function failMsg(registerType, errorMsg){
+            $("#fail").css("display","block");
+            $("#registerType").text(registerType);
+            $("#errorMsg").text(errorMsg);
+        }
+
+        $("#close2").on("click",function(){
+            $("#succeed").css("display","none");
+        })
+
+        $("#close3").on("click",function(){
+            $("#fail").css("display","none");
+        })
+
+        //上传资质
+        //企业货主
+        upload.render({
+            elem: '#btnOne', //上传文件按钮
+            field: 'file', //文件域的字段名
+            url: '/file/upload.json', //后台服务地址
+            done: function (res, index, upload) {
+                console.log(res);//后台服务返回
+                console.log(index);
+                console.log(upload);
+                $("#UpImg").attr("src", '/file/images/' + res.record.filePath)
+                $("input[name='businessLicense']").val('/file/images/' + res.record.filePath)
+                form.render()
+            }
+        });
+        
+      //企业承运商-运营证
+        upload.render({
+            elem: '#btnTwo', //上传文件按钮
+            field: 'file', //文件域的字段名
+            url: '/file/upload.json', //后台服务地址
+            done: function (res, index, upload) {
+                console.log(res);//后台服务返回
+                console.log(index);
+                console.log(upload);
+                $("#UpImg2").attr("src", '/file/images/' + res.record.filePath)
+                $("input[name='licenseOneUrl']").val('/file/images/' + res.record.filePath)
+                form.render()
+            }
+        });
+      
+      //企业承运商--运输许可
+        upload.render({
+            elem: '#btnThree', //上传文件按钮
+            field: 'file', //文件域的字段名
+            url: '/file/upload.json', //后台服务地址
+            done: function (res, index, upload) {
+                console.log(res);//后台服务返回
+                console.log(index);
+                console.log(upload);
+                $("#UpImg2_2").attr("src", '/file/images/' + res.record.filePath)
+                $("input[name='licenseTwoUrl']").val('/file/images/' + res.record.filePath)
+                form.render()
+            }
+        });
+      
+      //个人承运--身份正面
+        upload.render({
+            elem: '#btnFour', //上传文件按钮
+            field: 'file', //文件域的字段名
+            url: '/file/upload.json', //后台服务地址
+            done: function (res, index, upload) {
+                console.log(res);//后台服务返回
+                console.log(index);
+                console.log(upload);
+                $("#UpImg3").attr("src", '/file/images/' + res.record.filePath)
+                $("input[name='licenseOneUrl']").val('/file/images/' + res.record.filePath)
+                form.render()
+            }
+        });
+      
+        //个人承运--身份反面
+        upload.render({
+            elem: '#btnFive', //上传文件按钮
+            field: 'file', //文件域的字段名
+            url: '/file/upload.json', //后台服务地址
+            done: function (res, index, upload) {
+                console.log(res);//后台服务返回
+                console.log(index);
+                console.log(upload);
+                $("#UpImg3_2").attr("src", '/file/images/' + res.record.filePath)
+                $("input[name='licenseTwoUrl']").val('/file/images/' + res.record.filePath)
+                form.render()
+            }
+        });
+        
+    });
+
+    
+  //验证电话或证件号码是否已注册
+    function exsitNumberWasUse(propertyName,value,type){
+    	var flag = false;
+    	$.ajax({
+    		type:"post",
+	    	url: "/dubbo/cmdp/cmpCarrierManager/exsitCmpCarrierByProperty.json",
+	        data: {'propertyName':propertyName,'value':value,'type':type},
+	        dataType:"json",
+	        async:false,
+	        success: function (data) {
+            	var result = data.record;
+            	if(result.flag == "0"){
+            		flag =  true;
+            	}else{
+            		flag =  false;
+            	}
+            }
+    	});
+    	return flag;
+    }
+    
+    //服务协议
+    oAgree = document.getElementById('Agree');
+    oAgree2 = document.getElementById('Agree2');
+    oAgree3 = document.getElementById('Agree3');
+    popup(oAgree);
+    popup(oAgree2);
+    popup(oAgree3);
+    function popup(id) {
+        var oPopup = document.getElementById('popup');
+        id.onclick = function () {
+            oPopup.style.display = "block";
+        };
+        var closePop = document.getElementById("close");
+        closePop.onclick = function () {
+            oPopup.style.display = "none";
+        }
+    }
+
+    
+</script>
+</body>
+</html>

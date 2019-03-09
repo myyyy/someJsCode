@@ -1,0 +1,25 @@
+{
+    "styleJson":[
+            {
+                      "featureType": "poilabel",
+                      "elementType": "all",
+                      "stylers": {
+                                "visibility": "off"
+                      }
+            },
+            {
+                      "featureType": "manmade",
+                      "elementType": "all",
+                      "stylers": {
+                                "visibility": "off"
+                      }
+            },
+            {
+                      "featureType": "building",
+                      "elementType": "all",
+                      "stylers": {
+                                "visibility": "off"
+                      }
+            }
+  ]
+  }

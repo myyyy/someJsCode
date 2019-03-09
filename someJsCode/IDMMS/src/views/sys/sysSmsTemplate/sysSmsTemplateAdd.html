@@ -1,0 +1,95 @@
+<input type="hidden" id="callBack" />
+<div class="add">
+	<form id="addForm" class="layui-form layui-form-pane" action="">
+		<div class="layui-hide">
+			<input name="id" class="layui-input" type="text" />
+			<input name="templateid" class="layui-input" type="text" />
+		</div>
+
+		<div class="layui-form-item">
+			<label class="layui-form-label">模板名称</label>
+			<div class="layui-input-inline">
+				<input name="templateName" lay-verify="required" placeholder="请输入模板名称" autocomplete="on"
+					class="layui-input" type="text" />
+			</div>
+			<label class="layui-form-label">模板代号</label>
+			<div class="layui-input-inline">
+				<input name="templateShortName" lay-verify="required" placeholder="请输入模板代号" autocomplete="on"
+					class="layui-input" type="text" />
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">短信类型</label>
+			<div class="layui-input-inline">
+				<select name="type" id="type" lay-verify="required" convert="sms_template_type" class="layui-input">
+					<option value="">全部</option>
+				</select>
+			</div>
+			<label class="layui-form-label">系统模块</label>
+			<div class="layui-input-inline">
+				<input name="sysModule" placeholder="请输入系统模块" autocomplete="off" class="layui-input" type="text" />
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">短信签名</label>
+			<div class="layui-input-inline">
+				<input name="autograph" lay-verify="required" placeholder="请输入短信签名" autocomplete="on"
+					class="layui-input" type="text" />
+			</div>
+			<label class="layui-form-label">发送对象</label>
+			<div class="layui-input-inline">
+				<input name="sendRoles" placeholder="请输入发送对象" autocomplete="off" class="layui-input" type="text" />
+			</div>
+		</div>
+		<div class="layui-form-item" id="readOnlyContainer" style="display: none">
+			<label class="layui-form-label">模板类型</label>
+			<div class="layui-input-block">
+				<select name="templateType" lay-verify="required" convert="template_type" class="layui-input">
+				</select>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">发送条件</label>
+			<div class="layui-input-block">
+				<input name="sendCondition" placeholder="请输入发送条件" autocomplete="off" class="layui-input" type="text" />
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">短信内容</label>
+			<div class="layui-input-block">
+				<textarea name="content" placeholder="请输入短信内容" class="layui-textarea" lay-verify="required"></textarea>
+			</div>
+		</div>
+		<div>
+			<button class="lay-submit" lay-submit="" lay-filter="save" style="display: none;"></button>
+		</div>
+	</form>
+</div>
+<script>
+	/* <![CDATA[ */
+	layui.use(['form', 'layer'], function () {
+		var layer = layui.layer, form = layui.form, $ = layui.jquery;
+
+
+		form.on("submit(save)", function (data) {
+			var index = layer.msg('提交中，请稍候', {
+				icon: 16,
+				time: false,
+				shade: 0.8
+			});
+			layer.ajax({
+				url: "/dubbo/sys/sysSmsTemplateManager/saveSysSmsTemplate.json",
+				data: data.field,
+				success: function (result) {
+					layer.close(index);
+					$('#callBack').click();
+					var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+					parent.layer.close(index); //再执行关闭 
+				}
+			});
+			return false;
+		});
+	});
+
+	/* ]]> */
+</script>

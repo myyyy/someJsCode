@@ -1,0 +1,14 @@
+1.被拖拽的元素不要是超链接，因为阻止了默认事件，所以想让元素内的超链接也打开是不现实的，否则手工取消默认的阻止代码；
+2.拖拽意味着该元素是绝对定位，非绝对定位的元素不能被拖拽。
+
+drag.js:
+http://www.jq22.com/jquery-info584
+http://www.jq22.com/yanshi5844
+
+
+微信包粽子游戏：
+demo:
+http://blog.csdn.net/u012011360/article/details/45743039
+
+API：
+http://www.cnblogs.com/ganqiyin/archive/2013/12/12/3471622.html

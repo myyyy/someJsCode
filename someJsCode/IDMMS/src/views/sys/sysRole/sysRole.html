@@ -1,0 +1,179 @@
+<!-- 角色管理 -->
+<div class="main-content">
+    <form class="layui-form" action="">
+        <div class="layui-row" id="fieldsOfSearch">
+            <div class="layui-col-md3 layui-col-sm3 layui-col-xs3">
+                <label class="layui-form-label">角色名称：</label>
+                <div class="layui-input-inline">
+                    <input name="roleName" placeholder="角色代码" autocomplete="off" operator="LIKE" class="layui-input"
+                        type="text" />
+                </div>
+            </div>
+            <div class="layui-col-md3 layui-col-sm3 layui-col-xs3 layui_gridButton">
+                <button type="button" class="layui-btn" data-method="reload"><i class="fa fa-search"></i>搜索
+                </button>
+                <button type="reset" class="layui-btn layui-btn-primary"><i class="fa fa-refresh"></i>重置
+                </button>
+            </div>
+        </div>
+    </form>
+    
+    <!--数据表格-->
+    <table id="grid_table" class="layui-table" lay-filter="grid_table">
+    </table>
+</div>
+<script type="text/html" id="tableBar">
+    <div class="layui-btn-group layui_gridButton">
+        <!-- <button class="layui-btn" data-method="add"><i class="fa fa-plus"></i>新增</button> -->
+        <button class="layui-btn" data-method="edit"><i class="fa fa-pencil"></i>编辑</button>
+        <!-- <button class="layui-btn" data-method="del"><i class="fa fa-trash"></i>删除</button> -->
+        <button class="layui-btn" data-method="exportXls"><i class="fa fa-cloud-download"></i>导出Excel</button>
+    </div>
+</script>
+<script>
+    /* <![CDATA[ */
+    //表格渲染
+    layui.use(['layer', 'table', 'laydate'], function () {
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var table = layui.table;
+        var laydate = layui.laydate;
+
+        var cols = [[
+            { type: 'checkbox', fixed: 'left' },
+            { field: 'roleId', title: '角色编码', width: '20%' },
+            { field: 'roleName', title: '角色名称', width: '30%' },
+            { field: 'roleCaption', title: '角色描述', width: '45%' }
+        ]];
+        var tableElement = table.render({
+            elem: '#grid_table',
+            method: 'post',
+            url: "/dubbo/sys/sysRoleManager/getPagerSysRoles.json",
+            cellMinWidth: 80,
+            toolbar: "#tableBar",
+            defaultToolbar: ['filter', 'print', 'exports'],
+            height: 'full-150',
+            cols: cols,
+            page: true,
+            limits: [15, 30, 90, 150],
+            limit: 15,
+            done: function (res, page, count, convertArray) {
+            }
+        });
+
+        //新增
+        var active = {
+            reload: function () {
+                //执行重载
+                var params = tableElement.reloadBuild($('#fieldsOfSearch'));
+                table.reload('grid_table', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    },
+                    where: params
+                });
+            },
+            add: function () {
+                layer.open({
+                    type: 2,
+                    title: '新增-角色',
+                    area: ['100%', '100%'],
+                    shade: 0.1,
+                    maxmin: true,
+                    content: '/page/sys.sysRole/sysRoleAdd.html',
+                    btn: ['保存', '关闭'], //按钮
+                    yes: function (index, layero) {
+                        var body = layer.getChildFrame('body', index);
+                        body.find('button.lay-submit').click();
+                    },
+                    btn2: function (index, layero) {
+                        layer.close();
+                    },
+                    success: function (layero, index) {
+                        var iframeWin = window[layero.find('iframe')[0]['name']];
+                        iframeWin.initPage();
+                        var body = layer.getChildFrame('body', index);
+                        body.find('#callBack').click(function () {
+                            layer.msg('新增成功');
+                            tableElement.reload();
+                        });
+                    }
+                });
+            },
+            //编辑
+            edit: function () {
+                var checkedRows = table.checkStatus('grid_table').data || [];
+                if (checkedRows.length <= 0) {
+                    layer.msg("请勾选要编辑数据的复选框！");
+                    return;
+                } else if (checkedRows.length > 1) {
+                    layer.msg("每次只能编辑一条数据！");
+                    return;
+                }
+                var rowData = checkedRows[0];
+                layer.open({
+                    type: 2,
+                    title: '编辑-角色',
+                    area: ['100%', '100%'],
+                    shade: 0.1,
+                    maxmin: true,
+                    content: '/page/sys.sysRole/sysRoleAdd.html',
+                    btn: ['保存', '关闭'],
+                    yes: function (index, layero) {
+                        var body = layer.getChildFrame('body', index);
+                        body.find('button.lay-submit').click();
+                    },
+                    btn2: function () {
+                        layer.close();
+                    },
+                    success: function (layero, index) {
+                        var iframeWin = window[layero.find('iframe')[0]['name']];
+                        iframeWin.initPage(rowData);
+                        var body = layer.getChildFrame('body', index);
+                        body.find('#callBack').click(function () {
+                            layer.msg('编辑成功');
+                            tableElement.reload();
+                        });
+                    }
+                });
+            },
+            //删除
+            del: function () {
+                var checkedRows = table.checkStatus('grid_table').data || [];
+                if (checkedRows.length <= 0) {
+                    layer.msg("请勾选要删除的数据！");
+                    return;
+                }
+                var params = [];
+                for (var i = 0; i < checkedRows.length; i++) {
+                    params.push('id=' + checkedRows[i].roleId);
+                }
+                layer.confirm('是否删除所选' + checkedRows.length + '条数据？', { icon: 3, title: '提示' }, function () {
+                    layer.ajax({
+                        url: "/dubbo/sys/sysRoleManager/removeSysRoles.json",
+                        data: params.join('&'),
+                        success: function (result) {
+                            layer.msg('删除数据成功', { icon: 1 });
+                            tableElement.reload();
+                        }
+                    });
+                });
+            },
+            exportXls: function () {
+                tableElement.exportRecords({
+                    //page:1,
+                    //maxSize:20000,
+                    //type:'xls',
+                    //cols:[],
+                    title: '角色-数据'
+                });
+            }
+        };
+        $('.layui_gridButton .layui-btn').on('click', function () {
+            var othis = $(this), method = othis.data('method');
+            active[method] ? active[method].call(this, othis) : '';
+        });
+
+    });
+/* ]]> */
+</script>

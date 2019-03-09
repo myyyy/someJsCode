@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <title>用户注册</title>
+    <link href="./images/favicon.ico" rel="shortcut icon" />
+    <link href="./css/mylogin.css" rel="stylesheet" />
+    <link href="./css/font-awesome.min.css" rel="stylesheet" />
+</head>
+<body>
+    <form class="layui-form" action="">
+        <ul class="FieldsOfSearch" id="fieldsOfSearch">
+            <li>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">公司名称： </label>
+                    <div class="layui-input-inline">
+                        <input name="companyName" placeholder="公司名称" autocomplete="off" operator="LIKE"
+                            class="layui-input" type="text" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">公司类型 ： </label>
+                    <div class="layui-input-inline">
+                        <select name="registerType" class="field-input" convert="register_type"></select>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">审核状态： </label>
+                    <div class="layui-input-inline">
+                        <select name="checkStatus" class="field-input" convert="carrier_check_status"></select>
+                    </div>
+                </div>
+                <div class="layui-form-item gridButton">
+                    <div class="layui-input-block">
+                        <button type="button" class="layui-btn" data-method="reload"><i class="fa fa-search"></i>搜索
+                        </button>
+                        <button type="reset" class="layui-btn layui-btn-primary"><i class="fa fa-refresh"></i>重置
+                        </button>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <input type="hidden" id="idFace" name="idFace">
+    </form>
+
+    <div class="layui-btn-group functionalZone gridButton">
+        <button class="layui-btn" data-method="view"><i class="fa fa-plus"
+                shiro:hasPermission="regist:view"></i>查看</button>
+        <button class="layui-btn" data-method="edit"><i class="fa fa-pencil"
+                shiro:hasPermission="regist:edit"></i>审核</button>
+    </div>
+
+    <!--数据表格-->
+    <table id="grid_table" class="layui-table" lay-filter="grid_table">
+    </table>
+</body>
+</html>
+<script src="./plugins/jquery/jquery-2.2.3.min.js"></script>
+<script src="./layui.js"></script>
+<script>
+    var licenseOneUrl = "";  //身份证正面
+    var licenseTwoUrl = "";  //身份证反面
+    var companyType = "";   //公司类型
+    var information = "";   //审批意见
+    var registerType = "";
+    var id = "";
+    /* <![CDATA[ */
+    //表格渲染
+    layui.use(['layer', 'table', 'laydate', 'upload'], function () {
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var table = layui.table;
+        var laydate = layui.laydate;
+        var upload = layui.upload;
+        var cols = [[
+            { type: 'checkbox', fixed: 'left' },
+            { type: 'numbers', title: '序号', fixed: 'left', width: '4%' },
+            { field: 'companyName', title: '公司名称', width: '13%', fixed: 'left', sort: true },
+            { field: 'registerType', title: '公司类型', convert: 'register_type', width: '8%' },
+            { field: 'idType', title: '证件类型', convert: 'id_type', width: '8%' },
+            { field: 'idNo', title: '证件号码', width: '10%' },
+            { field: 'address', title: '地址', width: '12%' },
+            { field: 'contactsName', title: '联系人', width: '8%' },
+            { field: 'contactsTel', title: '联系人手机号', width: '8%' },
+            { field: 'applyDate', title: '申请日期', width: '8%', sort: true },
+            { field: 'checkDate', title: '审核日期', width: '8%', sort: true },
+            { field: 'checkStatus', title: '审核状态', convert: 'carrier_check_status', width: '6%' },
+            { field: 'checkOpinion', title: '审核意见', width: '10%' },
+            { field: 'Id', title: 'id', width: '10%' },
+        ]];
+        var tableElement = table.render({
+            elem: '#grid_table',
+            method: 'post',
+            url: "/dubbo/cmdp/cmdRegisterManager/getPagerCmdRegisters.json",
+            cellMinWidth: 80,
+            height: 'full-150',
+            cols: cols,
+            page: true,
+            limits: [10, 20, 30, 40],
+            limit: 10,
+            done: function (res, page, count, convertArray) {
+                $("[data-field='Id']").css("display", "none");
+            }
+        });
+
+        //
+        var active = {
+            reload: function () {
+                //执行重载
+                var params = tableElement.reloadBuild($('#fieldsOfSearch'));
+                table.reload('grid_table', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    },
+                    where: params
+                });
+            },
+            //编辑
+            edit: function () {
+                var checkedRows = table.checkStatus('grid_table').data || [];
+                if (checkedRows.length <= 0) {
+                    layer.msg("请勾选要编辑数据的复选框！");
+                    return;
+                } else if (checkedRows.length > 1) {
+                    layer.msg("每次只能编辑一条数据！");
+                    return;
+                }
+                var rowData = checkedRows[0];
+                if (rowData.checkStatus != "10") {
+                    layer.msg("该条数据已审核，详情请点击查看按钮！");
+                    return false;
+                }
+                //将身份证正面图片地址、反面地址、营业执照地址保存
+                licenseOneUrl = rowData.licenseOneUrl;
+                licenseTwoUrl = rowData.licenseTwoUrl;
+                registerType = rowData.registerType;
+                id = rowData.Id;
+                if (registerType == '01' || registerType == '02') {
+                    companyType = "10";
+                } else if (registerType == '03') {
+                    companyType = "20";
+                }
+
+                var child = layer.open({
+                    type: 2,
+                    title: '审核-注册信息',
+                    area: ['830px', '710px'],
+                    shade: 0.1,
+                    maxmin: true,
+                    content: '/page/platform.register/check.html',
+                    btn: ['审批通过', '审批不通过', '关闭'],
+                    //通过
+                    yes: function (index, layero) {
+                        var iframeWin = window[layero.find('iframe')[0]['name']];
+                        information = iframeWin.getInfo();
+                        layer.confirm('是否确定审批通过？', { icon: 3, title: '提示' }, function () {
+                            layer.ajax({
+                                url: "/dubbo/cmdp/cmdRegisterManager/checkCmdRegister.json",
+                                data: {
+                                    id: id, //主键
+                                    checkStatus: "20",      //标识
+                                    checkOpinion: information,  //审核意见
+                                    registerType: registerType  //注册类型
+                                },
+                                success: function (data) {
+                                    console.log(data);
+                                    if (data.html == "SUCCESS") {
+                                        layer.msg(data.html, { icon: 1 });
+                                    } else {
+                                        layer.msg(data.html, { icon: 2 });
+                                    }
+                                    layer.close(child);
+                                    tableElement.reload();
+                                }
+                            });
+                        });
+                    },
+                    //不通过
+                    btn2: function (index, layero) {
+                        var iframeWin = window[layero.find('iframe')[0]['name']];
+                        information = iframeWin.getInfo();
+                        layer.confirm('是否确定审批不通过？', { icon: 3, title: '提示' }, function () {
+                            layer.ajax({
+                                url: "/dubbo/cmdp/cmdRegisterManager/checkCmdRegister.json",
+                                data: {
+                                    id: id, //主键
+                                    checkStatus: "30",      //审核状态
+                                    checkOpinion: information,  //审核意见
+                                    registerType: registerType  //注册类型
+                                },
+                                success: function (data) {
+                                    console.log(data);
+                                    if (data.html == "SUCCESS") {
+                                        layer.msg(data.html, { icon: 1 });
+                                    } else {
+                                        layer.msg(data.html, { icon: 2 });
+                                    }
+                                    layer.close(child);
+                                    tableElement.reload();
+                                }
+                            });
+                        });
+                    },
+                    btn3: function () {
+                        layer.close();
+                    },
+                    success: function (layero, index) {
+                        var body = layer.getChildFrame('body', index);
+                        var form = body.find('form');
+                        util.fillFormData(form, rowData, null);
+                        body.find('#callBack').click(function () {
+                            layer.msg('审核成功');
+                            tableElement.reload();
+                        });
+                    }
+                });
+            },
+            //查看
+            view: function () {
+                var checkedRows = table.checkStatus('grid_table').data || [];
+                if (checkedRows.length <= 0) {
+                    layer.msg("请勾选要查看数据的复选框！");
+                    return;
+                } else if (checkedRows.length > 1) {
+                    layer.msg("每次只能查看一条数据！");
+                    return;
+                }
+                var rowData = checkedRows[0];
+                //将身份证正面图片地址、反面地址、营业执照地址保存
+                licenseOneUrl = rowData.licenseOneUrl;
+                licenseTwoUrl = rowData.licenseTwoUrl;
+                registerType = rowData.registerType;
+                id = rowData.Id;
+                if (registerType == '01' || registerType == '02') {
+                    companyType = "10";
+                } else if (registerType == '03') {
+                    companyType = "20";
+                }
+                var child = layer.open({
+                    type: 2,
+                    title: '审核-注册信息',
+                    area: ['830px', '710px'],
+                    shade: 0.1,
+                    maxmin: true,
+                    content: '/page/platform.register/check.html',
+                    btn: ['关闭'],
+                    //通过
+                    yes: function (index, layero) {
+                        layer.close(child);
+                    },
+                    success: function (layero, index) {
+                        var body = layer.getChildFrame('body', index);
+                        var form = body.find('form');
+                        util.fillFormData(form, rowData, null);
+                        body.find('#callBack').click(function () {
+                            layer.msg('审核成功');
+                            tableElement.reload();
+                        });
+                    }
+                });
+            },
+
+        };
+        $('.gridButton .layui-btn').on('click', function () {
+            var othis = $(this), method = othis.data('method');
+            active[method] ? active[method].call(this, othis) : '';
+        });
+
+    });
+    /* ]]> */
+</script>
